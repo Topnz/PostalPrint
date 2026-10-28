@@ -1,0 +1,44 @@
+# The repo is public: nothing containing personal data or secrets may be committed (see docs/SPEC.md, "Privacy")
+
+# --- Personal data and local settings (must NEVER reach GitHub) ---
+# History, label PDFs, backups, config (sender address) and temporary files
+data/
+
+# Secrets, e.g. API keys for future integrations
+.env
+.env.*
+!.env.example
+
+# Generated labels contain addresses, wherever they end up
+*.pdf
+
+# Logs may contain addresses
+*.log
+
+# Local AI assistant settings
+.claude/
+
+# --- Build output (scripts/build_exe.py) ---
+build/
+dist/
+
+# --- Python ---
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# --- Tests ---
+.pytest_cache/
+.coverage
+htmlcov/
+
+# --- IntelliJ (personal IDE settings) ---
+.idea/
+*.iml
+
+# --- Windows / macOS ---
+Thumbs.db
+desktop.ini
+.DS_Store

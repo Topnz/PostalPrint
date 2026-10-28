@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PostalPrint</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='7' width='26' height='18' rx='3' fill='%230071e3'/%3E%3Crect x='7' y='16' width='14' height='2.5' rx='1' fill='white'/%3E%3Crect x='7' y='20' width='10' height='2.5' rx='1' fill='white'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">PostalPrint</div>
+    <nav class="tabs" aria-label="Visninger">
+      <button type="button" class="tab" data-view="new">Ny etiket</button>
+      <button type="button" class="tab" data-view="history">Historik <kbd>Ctrl H</kbd></button>
+      <button type="button" class="tab" data-view="settings">Indstillinger <kbd>Ctrl ,</kbd></button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- New label -->
+    <section id="view-new" class="view" hidden>
+      <div class="new-layout">
+        <form id="label-form" class="card form-card" novalidate autocomplete="off">
+          <h1>Ny etiket</h1>
+          <p class="subtle">Tip: indsæt en hel adresse (flere linjer) i Navn, så fordeles den automatisk.</p>
+
+          <div id="sender-banner" class="banner warning" hidden>
+            Afsenderadressen mangler. <button type="button" class="link" data-goto="settings">Udfyld den under Indstillinger</button>
+          </div>
+
+          <div class="field" data-field="name">
+            <label for="f-name">Navn</label>
+            <input id="f-name" name="r_name" type="text" spellcheck="false" autocomplete="off">
+            <div class="msg"></div>
+          </div>
+          <div class="field" data-field="street">
+            <label for="f-street">Adresse</label>
+            <input id="f-street" name="r_street" type="text" spellcheck="false" autocomplete="off" placeholder="Vejnavn 12, 2. tv">
+            <div class="msg"></div>
+          </div>
+          <div class="row">
+            <div class="field postcode" data-field="postcode">
+              <label for="f-postcode">Postnr.</label>
+              <input id="f-postcode" name="r_postcode" type="text" inputmode="numeric" maxlength="8" autocomplete="off">
+              <div class="msg"></div>
+            </div>
+            <div class="field grow" data-field="city">
+              <label for="f-city">By</label>
+              <input id="f-city" name="r_city" type="text" spellcheck="false" autocomplete="off">
+              <div class="msg"></div>
+            </div>
+          </div>
+          <div id="address-status" class="address-status" aria-live="polite"></div>
+          <div class="field" data-field="extra">
+            <label for="f-extra">Ekstra linje <span class="optional">valgfri – c/o, spejdergruppe osv.</span></label>
+            <input id="f-extra" name="r_extra" type="text" spellcheck="false" autocomplete="off">
+            <div class="msg"></div>
+          </div>
+
+          <div id="form-message" class="banner" hidden></div>
+
+          <div class="actions">
+            <button type="submit" id="print-button" class="primary">Print</button>
+            <span class="hint"><kbd>Enter</kbd> printer · <kbd>Esc</kbd> rydder</span>
+          </div>
+        </form>
+
+        <div class="card preview-card">
+          <h2>Forhåndsvisning</h2>
+          <div class="envelope">
+            <svg id="preview" viewBox="0 0 150 100" role="img" aria-label="Forhåndsvisning af etiketten">
+              <rect class="label-edge" x="0.3" y="0.3" width="149.4" height="99.4" rx="2"></rect>
+              <rect class="label-margin" x="15" y="15" width="120" height="70"></rect>
+              <g id="preview-content"></g>
+            </svg>
+          </div>
+          <p id="preview-caption" class="subtle"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- History -->
+    <section id="view-history" class="view" hidden>
+      <div class="card">
+        <div class="history-head">
+          <h1>Historik</h1>
+          <input id="history-search" type="search" placeholder="Søg på navn, adresse eller by" autocomplete="off" spellcheck="false">
+          <button type="button" id="open-folder" class="secondary">Åbn historikmappe</button>
+        </div>
+        <div id="history-list"></div>
+      </div>
+    </section>
+
+    <!-- Settings -->
+    <section id="view-settings" class="view" hidden>
+      <form id="settings-form" class="card settings-card" novalidate autocomplete="off">
+        <h1>Indstillinger</h1>
+        <div id="welcome-banner" class="banner info" hidden>
+          Velkommen! Udfyld din afsenderadresse. Den står øverst på alle etiketter.
+        </div>
+
+        <h2>Afsender</h2>
+        <div class="field" data-field="sender.name">
+          <label for="s-name">Navn eller firma</label>
+          <input id="s-name" type="text" autocomplete="off">
+          <div class="msg"></div>
+        </div>
+        <div class="field" data-field="sender.street">
+          <label for="s-street">Adresse</label>
+          <input id="s-street" type="text" autocomplete="off">
+          <div class="msg"></div>
+        </div>
+        <div class="row">
+          <div class="field postcode" data-field="sender.postcode">
+            <label for="s-postcode">Postnr.</label>
+            <input id="s-postcode" type="text" inputmode="numeric" maxlength="8" autocomplete="off">
+            <div class="msg"></div>
+          </div>
+          <div class="field grow" data-field="sender.city">
+            <label for="s-city">By</label>
+            <input id="s-city" type="text" autocomplete="off">
+            <div class="msg"></div>
+          </div>
+        </div>
+
+        <h2>Print</h2>
+        <div class="field" data-field="print.mode">
+          <label for="s-mode">Sådan printes der</label>
+          <select id="s-mode">
+            <option value="sumatra">Direkte til labelprinteren (anbefalet)</option>
+            <option value="file">Åbn PDF'en – til test uden printer</option>
+            <option value="dialog">Vis printdialog</option>
+          </select>
+          <div class="msg"></div>
+        </div>
+        <div class="sumatra-only">
+          <div class="field" data-field="print.printer_name">
+            <label for="s-printer">Printer</label>
+            <div class="inline">
+              <select id="s-printer"></select>
+              <button type="button" id="refresh-printers" class="secondary small">Opdatér liste</button>
+            </div>
+            <div class="msg"></div>
+          </div>
+          <div class="field" data-field="print.sumatra_path">
+            <label for="s-sumatra">SumatraPDF</label>
+            <input id="s-sumatra" type="text" placeholder="Findes automatisk" autocomplete="off" spellcheck="false">
+            <div id="sumatra-status" class="subtle"></div>
+          </div>
+        </div>
+        <div class="field" data-field="print.rotation">
+          <label for="s-rotation">Rotation</label>
+          <select id="s-rotation">
+            <option value="90">90°</option>
+            <option value="270">270°</option>
+          </select>
+          <div class="subtle">Står teksten på hovedet? Skift rotation og print en kalibreringsetiket.</div>
+        </div>
+
+        <h2>Adressetjek</h2>
+        <label class="check">
+          <input id="s-online" type="checkbox">
+          <span>Tjek online at adressen findes (OpenStreetMap). Kun vej, nummer og postnummer sendes – aldrig navnet.</span>
+        </label>
+
+        <div class="actions">
+          <button type="submit" class="primary">Gem</button>
+          <button type="button" id="print-calibration" class="secondary">Print kalibreringsetiket</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <!-- Confirmation after printing -->
+  <div id="confirm" class="overlay" hidden>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+      <h2 id="confirm-title">Kom etiketten pænt ud?</h2>
+      <p id="confirm-recipient" class="recipient-summary"></p>
+      <div id="confirm-error" class="banner error" hidden></div>
+      <div class="dialog-actions">
+        <button type="button" id="confirm-yes" class="primary">Ja, gem <kbd>Enter</kbd></button>
+        <button type="button" id="confirm-reprint" class="secondary">Print igen <kbd>Esc</kbd></button>
+      </div>
+      <div class="dialog-links">
+        <button type="button" id="confirm-open-pdf" class="link">Åbn PDF</button>
+        <button type="button" id="confirm-cancel" class="link">Annullér (gem ikke i historikken)</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <iframe id="print-frame" class="print-frame" title="Print" tabindex="-1" aria-hidden="true"></iframe>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
