@@ -2,7 +2,7 @@
 
 A small local Windows app that prints recipient address labels for letters on a 100 × 150 mm thermal label printer, with no handwriting and no print dialog.
 
-**[⬇ Download PostalPrint.exe](../../releases/latest)** – Windows 10/11, nothing to install. See [Getting started](#getting-started-windows).
+**[ Download PostalPrint.exe](../../releases/latest)** – Windows 10/11, nothing to install. See [Getting started](#getting-started-windows).
 
 ![The label form with live preview](docs/images/screenshot.png)
 
